@@ -1,35 +1,86 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { fontsToTest } from "./fontTest";
+import { InfoBox } from "./InfoBox";
 
 function App() {
-  const [count, setCount] = useState(0)
+  // * system info
+  const userAgent = navigator.userAgent;
+  const language = navigator.language;
+
+  ///////////////////////////
+
+  // * webGL
+  const canvas = document.createElement("canvas");
+  const gl =
+    canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+  const debugInfo = (gl as WebGLRenderingContext).getExtension(
+    "WEBGL_debug_renderer_info"
+  );
+  const webGl: Record<string, string | undefined> = {};
+  if (debugInfo) {
+    webGl.vendor = (gl as WebGLRenderingContext).getParameter(
+      debugInfo.UNMASKED_VENDOR_WEBGL
+    );
+    webGl.renderer = (gl as WebGLRenderingContext).getParameter(
+      debugInfo.UNMASKED_RENDERER_WEBGL
+    );
+  }
+
+  ///////////////////////////
+
+  // * screen resolution
+  const screenInfo: Record<string, number> = {
+    width: window.screen.width,
+    height: window.screen.height,
+    colorDepth: window.screen.colorDepth,
+    pixelDepth: window.screen.pixelDepth,
+  };
+
+  ///////////////////////////
+
+  const timeFormat = Intl.DateTimeFormat().resolvedOptions();
+
+  ///////////////////////////
+
+  function detectInstalledFonts() {
+    const testString = "mmmmmmmmmmlli"; // Une chaîne générique pour mesurer les largeurs
+    const defaultWidth: Record<string, boolean> = {};
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+
+    // Liste des polices à tester, par région linguistique
+
+    if (context) {
+      const baseFont = "monospace";
+      context.font = `72px ${baseFont}`;
+      const baseWidth = context.measureText(testString).width;
+
+      // Teste chaque police
+      fontsToTest.forEach((font) => {
+        context.font = `72px ${font}, ${baseFont}`;
+        const width = context.measureText(testString).width;
+        defaultWidth[font] = width !== baseWidth; // Si la largeur diffère, la police est probablement installée
+      });
+    }
+
+    return defaultWidth;
+  }
+
+  // console.log("Installed Fonts:", detectInstalledFonts());
+
+  ///////////////////////////
+
+  localStorage.setItem("canIstorValue", "Yes, i can store value");
+  const storedValue = localStorage.getItem("canIstorValue");
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="bg-gray-900 min-h-screen flex flex-col items-center justify-center text-green-500 space-y-6">
+      <InfoBox title="System Info" data={{ userAgent, language }} />
+      <InfoBox title="WebGL" data={webGl} />
+      <InfoBox title="Screen Resolution" data={screenInfo} />
+      <InfoBox title="Time Format" data={{ timeFormat }} />
+      <InfoBox title="Local Storage" data={{ storedValue }} />
+    </div>
+  );
 }
 
-export default App
+export default App;
