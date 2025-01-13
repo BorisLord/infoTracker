@@ -1,4 +1,4 @@
-import { fontsToTest } from "./fontTest";
+// import { fontsToTest } from "./fontTest";
 import { InfoBox } from "./InfoBox";
 
 function App() {
@@ -73,6 +73,179 @@ function App() {
   const storedValue = localStorage.getItem("canIstorValue");
 
   ///////////////////////////
+
+  // // function getNetworkInfo() {
+  // //   const connection =
+  // //     navigator.connection ||
+  // //     navigator.mozConnection ||
+  // //     navigator.webkitConnection;
+  // //   if (!connection) return "Network information not available";
+
+  // //   return {
+  // //     effectiveType: connection.effectiveType, // ex: '4g', '3g'
+  // //     downlink: connection.downlink, // Vitesse de téléchargement estimée (Mb/s)
+  // //     rtt: connection.rtt, // Round-Trip Time estimé (ms)
+  // //   };
+  // // }
+
+  // // console.log("Network Info:", getNetworkInfo());
+
+  // ///////////////////////////
+
+  // function getPlatformInfo() {
+  //   if (navigator.userAgentData) {
+  //     navigator.userAgentData
+  //       .getHighEntropyValues(["platform", "platformVersion"])
+  //       .then((data) => {
+  //         console.log("Platform:", data.platform); // Exemple : "Windows"
+  //         console.log("Platform Version:", data.platformVersion); // Exemple : "10.0"
+  //       });
+  //   } else {
+  //     console.log("User-Agent Client Hints not supported.");
+  //   }
+  // }
+
+  // // console.log("Platform Info:", getPlatformInfo());
+
+  // ///////////////////////////
+
+  // function getPageLoadTime() {
+  //   const timing = performance.timing;
+  //   return {
+  //     loadTime: timing.loadEventEnd - timing.navigationStart, // Temps total de chargement
+  //     domComplete: timing.domComplete - timing.navigationStart, // DOM prêt
+  //   };
+  // }
+
+  // // console.log("Page Load Time:", getPageLoadTime());
+
+  // ///////////////////////////
+
+  // async function getBatteryInfo() {
+  //   if (!navigator.getBattery) {
+  //     return "Battery API not supported on this browser.";
+  //   }
+
+  //   const battery = await navigator.getBattery();
+  //   return {
+  //     charging: battery.charging, // true si l'appareil est en charge
+  //     level: battery.level * 100, // Niveau de batterie en pourcentage
+  //     chargingTime: battery.chargingTime, // Temps restant pour charger complètement (en secondes)
+  //     dischargingTime: battery.dischargingTime, // Temps restant avant décharge complète (en secondes)
+  //   };
+  // }
+
+  // // getBatteryInfo().then((info) => console.log("Battery Info:", info));
+
+  // function getMemoryInfo() {
+  //   if (!navigator.deviceMemory) {
+  //     return "Device Memory API not supported.";
+  //   }
+
+  //   return {
+  //     memory: `Navigator use around ${navigator.deviceMemory} GB`, // RAM estimée en gigaoctets
+  //   };
+  // }
+
+  // // console.log("Memory Info:", getMemoryInfo());
+
+  // function getFullNetworkInfo() {
+  //   const connection =
+  //     navigator.connection ||
+  //     navigator.mozConnection ||
+  //     navigator.webkitConnection;
+  //   if (!connection) {
+  //     return "Network information not available.";
+  //   }
+
+  //   return {
+  //     effectiveType: connection.effectiveType, // ex: '4g', '3g', 'wifi'
+  //     downlink: connection.downlink, // Vitesse de téléchargement estimée (Mb/s)
+  //     rtt: connection.rtt, // Round-Trip Time estimé (ms)
+  //     saveData: connection.saveData, // true si l'utilisateur utilise le mode "Data Saver"
+  //   };
+  // }
+
+  // // console.log("Full Network Info:", getFullNetworkInfo());
+
+  // function setupMotionListener() {
+  //   if (!window.DeviceMotionEvent) {
+  //     console.log("DeviceMotionEvent not supported.");
+  //     return;
+  //   }
+
+  //   window.addEventListener("devicemotion", (event) => {
+  //     const acceleration = event.acceleration; // Accélération linéaire
+  //     console.log("Device Motion:", {
+  //       x: acceleration?.x,
+  //       y: acceleration?.y,
+  //       z: acceleration?.z,
+  //     });
+  //   });
+  // }
+
+  // // setupMotionListener();
+
+  // // Add trigger action
+  // function getLocation() {
+  //   if (!navigator.geolocation) {
+  //     return "Geolocation API not supported.";
+  //   }
+
+  //   navigator.geolocation.getCurrentPosition(
+  //     (position) => {
+  //       console.log("Location:", {
+  //         latitude: position.coords.latitude,
+  //         longitude: position.coords.longitude,
+  //         accuracy: position.coords.accuracy, // Précision en mètres
+  //       });
+  //     },
+  //     (error) => console.error("Error getting location:", error),
+  //     { enableHighAccuracy: true }
+  //   );
+  // }
+
+  // // getLocation();
+
+  // function getThemePreference() {
+  //   const prefersDark = window.matchMedia(
+  //     "(prefers-color-scheme: dark)"
+  //   ).matches;
+  //   return prefersDark ? "Dark Mode" : "Light Mode";
+  // }
+
+  // // console.log("Theme Preference:", getThemePreference());
+
+  // function getProcessorInfo() {
+  //   if (!navigator.hardwareConcurrency) {
+  //     return "Hardware Concurrency API not supported.";
+  //   }
+
+  //   return {
+  //     logicalCores: navigator.hardwareConcurrency, // Nombre de cœurs logiques
+  //   };
+  // }
+
+  // // console.log("Processor Info:", getProcessorInfo());
+
+  // function getPerformanceMetrics() {
+  //   const [navigation] = performance.getEntriesByType("navigation");
+
+  //   if (!navigation) {
+  //     return "PerformanceNavigationTiming API not supported.";
+  //   }
+
+  //   return {
+  //     loadTime: navigation.loadEventEnd - navigation.startTime, // Temps total de chargement
+  //     domComplete: navigation.domComplete - navigation.startTime, // DOM prêt
+  //     domContentLoaded:
+  //       navigation.domContentLoadedEventEnd - navigation.startTime, // DOM Content Loaded
+  //     responseTime: navigation.responseEnd - navigation.requestStart, // Temps de réponse du serveur
+  //     redirectCount: navigation.redirectCount, // Nombre de redirections
+  //   };
+  // }
+
+  // console.log("Performance Metrics:", getPerformanceMetrics());
 
   return (
     <div className="bg-gray-900 min-h-screen flex flex-col items-center justify-center text-green-500 space-y-6">
