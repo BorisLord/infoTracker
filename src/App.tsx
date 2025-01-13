@@ -41,29 +41,29 @@ function App() {
 
   ///////////////////////////
 
-  function detectInstalledFonts() {
-    const testString = "mmmmmmmmmmlli"; // Une chaîne générique pour mesurer les largeurs
-    const defaultWidth: Record<string, boolean> = {};
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
+  // const detectInstalledFonts = () => {
+  //   const testString = "mmmmmmmmmmlli"; // Une chaîne générique pour mesurer les largeurs
+  //   const defaultWidth: Record<string, boolean> = {};
+  //   const canvas = document.createElement("canvas");
+  //   const context = canvas.getContext("2d");
 
-    // Liste des polices à tester, par région linguistique
+  //   // Liste des polices à tester, par région linguistique
 
-    if (context) {
-      const baseFont = "monospace";
-      context.font = `72px ${baseFont}`;
-      const baseWidth = context.measureText(testString).width;
+  //   if (context) {
+  //     const baseFont = "monospace";
+  //     context.font = `72px ${baseFont}`;
+  //     const baseWidth = context.measureText(testString).width;
 
-      // Teste chaque police
-      fontsToTest.forEach((font) => {
-        context.font = `72px ${font}, ${baseFont}`;
-        const width = context.measureText(testString).width;
-        defaultWidth[font] = width !== baseWidth; // Si la largeur diffère, la police est probablement installée
-      });
-    }
+  //     // Teste chaque police
+  //     fontsToTest.forEach((font) => {
+  //       context.font = `72px ${font}, ${baseFont}`;
+  //       const width = context.measureText(testString).width;
+  //       defaultWidth[font] = width !== baseWidth; // Si la largeur diffère, la police est probablement installée
+  //     });
+  //   }
 
-    return defaultWidth;
-  }
+  //   return defaultWidth;
+  // };
 
   // console.log("Installed Fonts:", detectInstalledFonts());
 
@@ -72,6 +72,8 @@ function App() {
   localStorage.setItem("canIstorValue", "Yes, i can store value");
   const storedValue = localStorage.getItem("canIstorValue");
 
+  ///////////////////////////
+
   return (
     <div className="bg-gray-900 min-h-screen flex flex-col items-center justify-center text-green-500 space-y-6">
       <InfoBox title="System Info" data={{ userAgent, language }} />
@@ -79,6 +81,7 @@ function App() {
       <InfoBox title="Screen Resolution" data={screenInfo} />
       <InfoBox title="Time Format" data={{ timeFormat }} />
       <InfoBox title="Local Storage" data={{ storedValue }} />
+      {/* <InfoBox title="Fonts" data={{ detectInstalledFonts }}></InfoBox> */}
     </div>
   );
 }
