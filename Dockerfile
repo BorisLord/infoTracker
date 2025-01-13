@@ -1,10 +1,10 @@
-# Étape 1 : Construction
-FROM node:lts-alpine AS builder
+# Utiliser l'image officielle Node.js LTS basée sur Alpine
+FROM node:lts-alpine
 
 # Définir le répertoire de travail
 WORKDIR /app
 
-# Copier les fichiers nécessaires
+# Copier uniquement les fichiers nécessaires pour l'installation des dépendances
 COPY package.json package-lock.json ./
 
 # Installer les dépendances
@@ -13,20 +13,14 @@ RUN npm ci
 # Copier le reste du code source
 COPY . .
 
-# Construire l'application
+# Construire l'application pour la production
 RUN npm run build
 
-# Étape 2 : Serveur Nginx pour la production
-FROM nginx:alpine
+# Installer 'serve' globalement pour servir les fichiers statiques
+RUN npm install -g serve
 
-# Copier les fichiers construits depuis l'étape précédente
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Exposer le port que 'serve' utilisera
+EXPOSE 3000
 
-# Remplacer la configuration par défaut de Nginx pour gérer une SPA
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Exposer le port HTTP
-EXPOSE 80
-
-# Démarrer Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Lancer l'application en mode production
+CMD ["serve", "-s", "dist"]
