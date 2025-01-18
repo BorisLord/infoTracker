@@ -8,7 +8,7 @@ interface InfoBoxProps {
 
 export const InfoBox: React.FC<InfoBoxProps> = ({ title, data }) => {
   return (
-    <div className="p-6 rounded-md border border-green-500">
+    <div className="p-6 rounded-md border border-green-500 w-full">
       <h1 className="text-xl font-bold mb-4 text-green-400">{title}</h1>
       <pre className="font-mono whitespace-pre-wrap">
         {Object.entries(data).map(([key, value]) => (

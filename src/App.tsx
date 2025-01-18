@@ -1,5 +1,6 @@
 // import { fontsToTest } from "./fontTest";
 import { InfoBox } from "./InfoBox";
+import MasonryGrid from "./MansoryGrid";
 
 function App() {
   // * system info
@@ -248,13 +249,37 @@ function App() {
   // console.log("Performance Metrics:", getPerformanceMetrics());
 
   return (
-    <div className="bg-gray-900 min-h-screen flex flex-col items-center justify-center text-green-500 space-y-6">
-      <InfoBox title="System Info" data={{ userAgent, language }} />
-      <InfoBox title="WebGL" data={webGl} />
-      <InfoBox title="Screen Resolution" data={screenInfo} />
-      <InfoBox title="Time Format" data={{ timeFormat }} />
-      <InfoBox title="Local Storage" data={{ storedValue }} />
-      {/* <InfoBox title="Fonts" data={{ detectInstalledFonts }}></InfoBox> */}
+    <div className="bg-gray-900 min-h-screen">
+      <h1 className="text-gray-400 text-3xl font-bold text-center mt-6">
+        Browser Insights
+      </h1>
+      <p className="text-gray-400 text-center mt-2 max-w-2xl mx-auto">
+        Explore the wealth of information your browser can provide and the
+        actions a web application can perform without your knowledge. These
+        include technical details, your settings, and your device's
+        capabilities.
+      </p>
+      <MasonryGrid>
+        <div className="grid-item bg-gray-800 p-6 rounded-md text-white col-span-2">
+          {/* Cette InfoBox occupe deux colonnes */}
+          <InfoBox title="System Info" data={{ userAgent, language }} />
+        </div>
+        <div className="grid-item flex space-x-6">
+          {/* Deux InfoBox côte à côte */}
+          <div className="bg-gray-800 p-6 rounded-md text-white">
+            <InfoBox title="WebGL" data={webGl} />
+          </div>
+          <div className="bg-gray-800 p-6 rounded-md text-white">
+            <InfoBox title="Screen Resolution" data={screenInfo} />
+          </div>
+        </div>
+        <div className="grid-item bg-gray-800 p-6 rounded-md text-white">
+          <InfoBox title="Time Format" data={{ timeFormat }} />
+        </div>
+        <div className="grid-item bg-gray-800 p-6 rounded-md text-white">
+          <InfoBox title="Local Storage" data={{ storedValue }} />
+        </div>
+      </MasonryGrid>
     </div>
   );
 }
