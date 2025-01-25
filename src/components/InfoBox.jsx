@@ -1,12 +1,4 @@
-interface InfoBoxProps {
-  title: string;
-  data: Record<
-    string,
-    string | number | undefined | null | Intl.ResolvedDateTimeFormatOptions
-  >;
-}
-
-export const InfoBox: React.FC<InfoBoxProps> = ({ title, data }) => {
+export const InfoBox = ({ title, data }) => {
   return (
     <div className="p-6 rounded-md border border-green-500 w-full">
       <h1 className="text-xl font-bold mb-4 text-green-400">{title}</h1>

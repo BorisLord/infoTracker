@@ -1,19 +1,1 @@
 @import "tailwindcss";
-
-.grid {
-    display: block;
-  }
-  
-  .grid-item {
-    break-inside: avoid; /* Empêche les sauts inappropriés */
-    margin-bottom: 1.25rem; /* Espacement entre les éléments */
-  }
-  
-  .grid-sizer {
-    width: 50%; /* Définit la largeur des colonnes */
-  }
-  
-  .grid-item.col-span-2 {
-    grid-column: span 2 !important; /* L'élément occupe deux colonnes */
-  }
-  
