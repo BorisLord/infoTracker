@@ -349,7 +349,7 @@ function App() {
                 Local Storage
               </h1>
               <p className="mb-4">
-                Value :
+                Value :&nbsp;
                 <span className="font-mono">
                   {storedValue
                     ? (storedValue.match(/.{0,25}/g) || []).join("\n")
