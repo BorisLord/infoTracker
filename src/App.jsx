@@ -215,8 +215,6 @@ function App() {
     };
   }, []);
 
-  console.log(motionData);
-
   function getPerformanceMetrics() {
     const [navigation] = performance.getEntriesByType("navigation");
     if (!navigation) {
@@ -232,6 +230,29 @@ function App() {
     };
   }
 
+  const [fps, setFps] = useState(0);
+
+  useEffect(() => {
+    let frameCount = 0;
+    let startTime = performance.now();
+
+    const calculateFPS = () => {
+      frameCount++;
+      const currentTime = performance.now();
+      const elapsed = currentTime - startTime;
+      if (elapsed >= 1000) {
+        setFps(frameCount);
+        frameCount = 0;
+        startTime = currentTime;
+      }
+      requestAnimationFrame(calculateFPS);
+    };
+    const animationFrame = requestAnimationFrame(calculateFPS);
+    return () => {
+      cancelAnimationFrame(animationFrame);
+    };
+  }, []);
+
   return (
     <div className="flex flex-col bg-gray-900 min-h-screen items-center">
       {/* Header */}
@@ -239,7 +260,7 @@ function App() {
         <img
           src="tracker.svg"
           width="40"
-          className="bg-orange-400 rounded-2xl mr-4 md:mr-8"
+          className="bg-orange-400 rounded-2xl md:mr-4"
         />
         <h1 className="text-green-500 text-4xl font-bold text-center">
           Info Tracker
@@ -247,55 +268,64 @@ function App() {
         <img
           src="tracker.svg"
           width="40"
-          className="ml-4 md:ml-8 bg-orange-400 rounded-2xl"
+          className="hidden md:block ml-4 bg-orange-400 rounded-2xl"
         />
       </div>
 
       {/* Description */}
       <p className="text-center mt-6 max-w-2xl text-white text-sm sm:text-base px-4">
-        Explore the wealth of information your browser can provide and the
-        actions a web application can perform without your knowledge. These
-        include technical details, your settings, and your device's
-        capabilities.
+        Discover how much information your browser can provide, from system
+        details to device capabilities. These details are often used by
+        companies for analytics, personalization, and tracking. <br />
+        However, this site does not store or share any data, it serves solely to
+        demonstrate the possibilities of your browser.
       </p>
 
-      {/* Content */}
       <div className="flex flex-col w-full max-w-5xl mt-10 space-y-4 px-4">
-        {/* InfoBox System Info */}
+        {/*  System Info */}
         <div className="bg-gray-800 p-6 rounded-md text-white">
           <InfoBox title="System Info" data={infoSystem} />
         </div>
+        <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+          {/* Position */}
+          <div className="bg-gray-800 p-6 rounded-md text-white flex-1">
+            <button
+              onClick={handleClick}
+              className="bg-green-500 hover:bg-orange-400 text-white font-bold py-2 px-4 rounded-md mb-2"
+            >
+              Ask for position
+            </button>
+            {onClick && location && (
+              <div className="flex flex-col p-6 rounded-md border border-green-500 w-full">
+                <div className="flex flex-col md:flex-row">
+                  <pre>latitude: {location.latitude}</pre>
+                  <pre className="md:ml-4">longitude: {location.longitude}</pre>
+                </div>
+                <div className="flex flex-col items-start mt-4 sm:text-base">
+                  <pre>
+                    {location.address.house_number}&nbsp;
+                    {location.address.road}
+                    <br />
+                    {location.address.postcode}&nbsp;
+                    {location.address.town}
+                  </pre>
+                </div>
+              </div>
+            )}
+            {onClick && error && (
+              <div className="text-red-500 mt-4">
+                <p>Error: {error}</p>
+              </div>
+            )}
+          </div>
 
-        {/* Plateforme Info */}
-        <div className="bg-gray-800 p-6 rounded-md text-white">
-          <button
-            onClick={handleClick}
-            className="bg-green-500 hover:bg-orange-400 text-white font-bold py-2 px-4 rounded-md mb-2"
-          >
-            Ask for position
-          </button>
-          {onClick && location && (
-            <div className="flex flex-col p-6 rounded-md border border-green-500 w-full">
-              <div className="flex flex-col md:flex-row">
-                <pre>latitude: {location.latitude}</pre>
-                <pre className="md:ml-4">longitude: {location.longitude}</pre>
-              </div>
-              <div className="flex flex-col items-start mt-4 sm:text-base">
-                <pre>
-                  {location.address.house_number}&nbsp;
-                  {location.address.road}
-                  <br />
-                  {location.address.postcode}&nbsp;
-                  {location.address.town}
-                </pre>
-              </div>
+          {/* FPS Monitor */}
+          <div className="p-6 bg-gray-800 text-white rounded-md flex">
+            <div className="p-6 rounded-md border border-green-500 w-full">
+              <h1 className="text-lg font-bold text-green-400">FPS Monitor</h1>
+              <p className="text-sm mt-4">Current FPS: {fps}</p>
             </div>
-          )}
-          {onClick && error && (
-            <div className="text-red-500 mt-4">
-              <p>Error: {error}</p>
-            </div>
-          )}
+          </div>
         </div>
 
         {/* Responsive Grid Sections */}
