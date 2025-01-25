@@ -1,10 +1,13 @@
 import { fontsToTest } from "./fontTest";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { InfoBox } from "./components/InfoBox";
 
 function App() {
-  // * system info
-  function getPosition() {
+  const [onClick, setOnClick] = useState(false);
+  const [location, setLocation] = useState(null);
+  const [error, setError] = useState(null);
+
+  const getPosition = async () => {
     const options = {
       enableHighAccuracy: true,
       timeout: 5000,
@@ -13,36 +16,98 @@ function App() {
 
     return new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const crd = pos.coords;
-          resolve({
-            latitude: crd.latitude,
-            longitude: crd.longitude,
-            precision: crd.accuracy,
-          });
+        async (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+
+          const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`;
+
+          try {
+            const response = await fetch(url);
+            if (!response.ok) {
+              throw new Error("Failed to fetch address");
+            }
+            const data = await response.json();
+
+            resolve({
+              latitude,
+              longitude,
+              address: data.address,
+            });
+          } catch (error) {
+            console.error(error);
+            reject("Failed to fetch address from Nominatim");
+          }
         },
-        () => {
-          reject({ error: "Can't get position" });
+        (err) => {
+          reject(`Error getting position: ${err.message}`);
         },
         options
       );
     });
-  }
+  };
 
-  // if (navigator.userAgentData) {
-  //   navigator.userAgentData
-  //     .getHighEntropyValues(["platform", "platformVersion"])
-  //     .then((data) => {
-  //       console.log("Platform:", data.platform);
-  //       console.log("Platform Version:", data.platformVersion);
-  //     });
-  // } else {
-  //   console.log("User-Agent Client Hints not supported.");
-  // }
+  const handleClick = async () => {
+    setOnClick(true);
+    try {
+      const position = await getPosition();
+      setLocation(position);
+      setError(null);
+    } catch (err) {
+      setLocation(null);
+      setError(err);
+    }
+  };
 
-  console.log("Platform Info:", getPosition());
-  const userAgent = navigator.userAgent;
-  const language = navigator.language;
+  const [batteryInfo, setBatteryInfo] = useState({});
+  const [infoSystem, setInfoSystem] = useState({});
+
+  useEffect(() => {
+    const fetchData = async () => {
+      // Récupérer les informations système
+      try {
+        let info = {};
+        if (navigator.userAgentData) {
+          const data = await navigator.userAgentData.getHighEntropyValues([
+            "platform",
+            "platformVersion",
+          ]);
+          info.Platform = data.platform;
+          info.Version = data.platformVersion;
+        } else {
+          info.User_Agent = "Client Hints not supported";
+        }
+        info.userAgent = navigator.userAgent;
+        info.language = navigator.language;
+        info.navigator_memory = navigator.deviceMemory + " GB";
+        (info.logicalCores = navigator.hardwareConcurrency),
+          setInfoSystem(info);
+      } catch (err) {
+        setInfoSystem({ error: err.message });
+      }
+
+      // Récupérer les informations sur la batterie
+      try {
+        if (!navigator.getBattery) {
+          setBatteryInfo({
+            battery: "Battery API not supported on this browser.",
+          });
+          return;
+        }
+        const battery = await navigator.getBattery();
+        setBatteryInfo({
+          charging: battery.charging,
+          level: battery.level * 100,
+          chargingTime: battery.chargingTime,
+          dischargingTime: battery.dischargingTime,
+        });
+      } catch (err) {
+        setBatteryInfo({ error: err.message });
+      }
+    };
+
+    fetchData(); // Appeler la fonction combinée
+  }, []);
 
   ///////////////////////////
 
@@ -50,17 +115,11 @@ function App() {
   const canvas = document.createElement("canvas");
   const gl =
     canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-  const debugInfo = gl.getExtension(
-    "WEBGL_debug_renderer_info"
-  );
+  const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
   const webGl = {};
   if (debugInfo) {
-    webGl.vendor = gl.getParameter(
-      debugInfo.UNMASKED_VENDOR_WEBGL
-    );
-    webGl.renderer = gl.getParameter(
-      debugInfo.UNMASKED_RENDERER_WEBGL
-    );
+    webGl.vendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
+    webGl.renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
   }
 
   ///////////////////////////
@@ -132,147 +191,53 @@ function App() {
     };
   }
 
-  // ///////////////////////////
-
-  // ///////////////////////////
-
-  // function getPageLoadTime() {
-  //   const timing = performance.timing;
-  //   return {
-  //     loadTime: timing.loadEventEnd - timing.navigationStart, // Temps total de chargement
-  //     domComplete: timing.domComplete - timing.navigationStart, // DOM prêt
-  //   };
-  // }
-
-  // // console.log("Page Load Time:", getPageLoadTime());
-
-  // ///////////////////////////
-
-  // async function getBatteryInfo() {
-  //   if (!navigator.getBattery) {
-  //     return "Battery API not supported on this browser.";
-  //   }
-
-  //   const battery = await navigator.getBattery();
-  //   return {
-  //     charging: battery.charging, // true si l'appareil est en charge
-  //     level: battery.level * 100, // Niveau de batterie en pourcentage
-  //     chargingTime: battery.chargingTime, // Temps restant pour charger complètement (en secondes)
-  //     dischargingTime: battery.dischargingTime, // Temps restant avant décharge complète (en secondes)
-  //   };
-  // }
-
-  // // getBatteryInfo().then((info) => console.log("Battery Info:", info));
-
-  // function getMemoryInfo() {
-  //   if (!navigator.deviceMemory) {
-  //     return "Device Memory API not supported.";
-  //   }
-
-  //   return {
-  //     memory: `Navigator use around ${navigator.deviceMemory} GB`, // RAM estimée en gigaoctets
-  //   };
-  // }
-
-  // // console.log("Memory Info:", getMemoryInfo());
-
-  // function getFullNetworkInfo() {
-  //   const connection =
-  //     navigator.connection ||
-  //     navigator.mozConnection ||
-  //     navigator.webkitConnection;
-  //   if (!connection) {
-  //     return "Network information not available.";
-  //   }
-
-  //   return {
-  //     effectiveType: connection.effectiveType, // ex: '4g', '3g', 'wifi'
-  //     downlink: connection.downlink, // Vitesse de téléchargement estimée (Mb/s)
-  //     rtt: connection.rtt, // Round-Trip Time estimé (ms)
-  //     saveData: connection.saveData, // true si l'utilisateur utilise le mode "Data Saver"
-  //   };
-  // }
-
-  // // console.log("Full Network Info:", getFullNetworkInfo());
+  const [motionData, setMotionData] = useState({
+    x: null,
+    y: null,
+    z: null,
+  });
 
   // function setupMotionListener() {
-  //   if (!window.DeviceMotionEvent) {
-  //     console.log("DeviceMotionEvent not supported.");
-  //     return;
-  //   }
-
-  //   window.addEventListener("devicemotion", (event) => {
-  //     const acceleration = event.acceleration; // Accélération linéaire
-  //     console.log("Device Motion:", {
-  //       x: acceleration?.x,
-  //       y: acceleration?.y,
-  //       z: acceleration?.z,
-  //     });
-  //   });
+  useEffect(() => {
+    if (!window.DeviceMotionEvent) {
+      setMotionData({
+        x: "unsupported",
+        y: "unsupported",
+        z: "unsupported",
+      });
+      return;
+    }
+    const handleMotion = (event) => {
+      const { x, y, z } = event.acceleration || {};
+      setMotionData({
+        x: x?.toFixed(2) || 0,
+        y: y?.toFixed(2) || 0,
+        z: z?.toFixed(2) || 0,
+      });
+    };
+    window.addEventListener("devicemotion", handleMotion);
+    return () => {
+      window.removeEventListener("devicemotion", handleMotion);
+    };
+  }, []);
   // }
 
-  // // setupMotionListener();
+  console.log(motionData);
 
-  // // Add trigger action
-  // function getLocation() {
-  //   if (!navigator.geolocation) {
-  //     return "Geolocation API not supported.";
-  //   }
-
-  //   navigator.geolocation.getCurrentPosition(
-  //     (position) => {
-  //       console.log("Location:", {
-  //         latitude: position.coords.latitude,
-  //         longitude: position.coords.longitude,
-  //         accuracy: position.coords.accuracy, // Précision en mètres
-  //       });
-  //     },
-  //     (error) => console.error("Error getting location:", error),
-  //     { enableHighAccuracy: true }
-  //   );
-  // }
-
-  // // getLocation();
-
-  // function getThemePreference() {
-  //   const prefersDark = window.matchMedia(
-  //     "(prefers-color-scheme: dark)"
-  //   ).matches;
-  //   return prefersDark ? "Dark Mode" : "Light Mode";
-  // }
-
-  // // console.log("Theme Preference:", getThemePreference());
-
-  // function getProcessorInfo() {
-  //   if (!navigator.hardwareConcurrency) {
-  //     return "Hardware Concurrency API not supported.";
-  //   }
-
-  //   return {
-  //     logicalCores: navigator.hardwareConcurrency, // Nombre de cœurs logiques
-  //   };
-  // }
-
-  // // console.log("Processor Info:", getProcessorInfo());
-
-  // function getPerformanceMetrics() {
-  //   const [navigation] = performance.getEntriesByType("navigation");
-
-  //   if (!navigation) {
-  //     return "PerformanceNavigationTiming API not supported.";
-  //   }
-
-  //   return {
-  //     loadTime: navigation.loadEventEnd - navigation.startTime, // Temps total de chargement
-  //     domComplete: navigation.domComplete - navigation.startTime, // DOM prêt
-  //     domContentLoaded:
-  //       navigation.domContentLoadedEventEnd - navigation.startTime, // DOM Content Loaded
-  //     responseTime: navigation.responseEnd - navigation.requestStart, // Temps de réponse du serveur
-  //     redirectCount: navigation.redirectCount, // Nombre de redirections
-  //   };
-  // }
-
-  // console.log("Performance Metrics:", getPerformanceMetrics());
+  function getPerformanceMetrics() {
+    const [navigation] = performance.getEntriesByType("navigation");
+    if (!navigation) {
+      return "PerformanceNavigationTiming API not supported.";
+    }
+    return {
+      loadTime: navigation.loadEventEnd - navigation.startTime,
+      domComplete: navigation.domComplete - navigation.startTime,
+      domContentLoaded:
+        navigation.domContentLoadedEventEnd - navigation.startTime,
+      responseTime: navigation.responseEnd - navigation.requestStart,
+      redirectCount: navigation.redirectCount,
+    };
+  }
 
   return (
     <div className="flex flex-col bg-gray-900 min-h-screen items-center">
@@ -300,13 +265,41 @@ function App() {
       <div className="flex flex-col w-full max-w-5xl mt-10 space-y-4 px-4">
         {/* InfoBox System Info */}
         <div className="bg-gray-800 p-6 rounded-md text-white">
-          <InfoBox title="System Info" data={{ userAgent, language }} />
+          <InfoBox title="System Info" data={infoSystem} />
         </div>
 
         {/* Plateforme Info */}
-
         <div className="bg-gray-800 p-6 rounded-md text-white">
-          <InfoBox title="Plateforme Info" data={getPosition()} />
+          <button
+            onClick={handleClick}
+            className="bg-green-500 hover:bg-orange-400 text-white font-bold py-2 px-4 rounded-md mb-2"
+          >
+            Ask for position
+          </button>
+
+          {onClick && location && (
+            <div className="flex flex-col p-6 rounded-md border border-green-500 w-full">
+              <div className="flex">
+                <pre>latitude: {location.latitude}</pre> &nbsp; &nbsp;
+                <pre>longitude: {location.longitude}</pre>
+              </div>
+
+              <div className="flex flex-col items-start mt-4">
+                <pre>
+                  {location.address.house_number}&nbsp;
+                  {location.address.road}&nbsp;
+                  {location.address.postcode}&nbsp;
+                  {location.address.town}
+                </pre>
+              </div>
+            </div>
+          )}
+
+          {onClick && error && (
+            <div className="text-red-500 mt-4">
+              <p>Error: {error}</p>
+            </div>
+          )}
         </div>
 
         {/*  WebGL  */}
@@ -314,6 +307,7 @@ function App() {
           <div className="bg-gray-800 p-6 rounded-md text-white flex-1">
             <InfoBox title="WebGL" data={webGl} />
           </div>
+
           {/* Screen Resolution */}
           <div className="bg-gray-800 p-6 rounded-md text-white flex-1">
             <InfoBox title="Screen Resolution" data={screenInfo} />
@@ -325,6 +319,7 @@ function App() {
           <div className="bg-gray-800 p-6 rounded-md text-white flex-1">
             <InfoBox title="Time Format" data={{ timeFormat }} />
           </div>
+
           {/* Local Storage */}
           <div className="bg-gray-800 p-6 rounded-md text-white flex-1">
             <div className="p-6 rounded-md border border-green-500">
@@ -357,16 +352,36 @@ function App() {
             </div>
           </div>
         </div>
+
         {/* Network */}
-        <div className="bg-gray-800 p-6 rounded-md text-white flex-1">
-          <InfoBox title="Network Info" data={getNetworkInfo()} />
+        <div className="flex flex-row justify-between space-x-4">
+          <div className="bg-gray-800 p-6 rounded-md text-white flex-1">
+            <InfoBox title="Network Info" data={getNetworkInfo()} />
+          </div>
+          {/* Battery */}
+          <div className="bg-gray-800 p-6 rounded-md text-white flex-1">
+            <InfoBox title="Battery Info" data={batteryInfo} />
+          </div>
+        </div>
+
+        {/* Motion */}
+        <div className="flex flex-row justify-between space-x-4">
+          <div className="bg-gray-800 p-6 rounded-md text-white flex-1">
+            <InfoBox title="Motion" data={motionData} />
+          </div>
+
+          <div className="bg-gray-800 p-6 rounded-md text-white flex-1">
+            <InfoBox title="Performance" data={getPerformanceMetrics()} />
+          </div>
         </div>
 
         {/* Fonts */}
         <div>
           <div className="bg-gray-800 p-6 rounded-md text-white flex-1">
             <div className="p-6 rounded-md border border-green-500">
-              <h1 className="text-xl mb-4 font-bold text-green-400">Fonts</h1>
+              <h1 className="text-xl mb-4 font-bold text-green-400">
+                Tested Fonts
+              </h1>
               <div className="grid grid-cols-3 gap-4">
                 {Object.entries(detectInstalledFonts()).map(([key, value]) => (
                   <div key={key} className={`flex  border-gray-700 `}>
