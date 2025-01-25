@@ -64,7 +64,6 @@ function App() {
 
   useEffect(() => {
     const fetchData = async () => {
-      // Récupérer les informations système
       try {
         let info = {};
         if (navigator.userAgentData) {
@@ -86,7 +85,6 @@ function App() {
         setInfoSystem({ error: err.message });
       }
 
-      // Récupérer les informations sur la batterie
       try {
         if (!navigator.getBattery) {
           setBatteryInfo({
@@ -106,7 +104,7 @@ function App() {
       }
     };
 
-    fetchData(); // Appeler la fonction combinée
+    fetchData();
   }, []);
 
   ///////////////////////////
@@ -139,23 +137,20 @@ function App() {
   ///////////////////////////
 
   const detectInstalledFonts = () => {
-    const testString = "mmmmmmmmmmlli"; // Une chaîne générique pour mesurer les largeurs
+    const testString = "mmmmmmmmmmlli";
     const defaultWidth = {};
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
-
-    // Liste des polices à tester, par région linguistique
 
     if (context) {
       const baseFont = "monospace";
       context.font = `72px ${baseFont}`;
       const baseWidth = context.measureText(testString).width;
 
-      // Teste chaque police
       fontsToTest.forEach((font) => {
         context.font = `72px ${font}, ${baseFont}`;
         const width = context.measureText(testString).width;
-        defaultWidth[font] = width !== baseWidth; // Si la largeur diffère, la police est probablement installée
+        defaultWidth[font] = width !== baseWidth;
       });
     }
 
@@ -185,9 +180,9 @@ function App() {
     if (!connection) return { error: "Network information not available" };
 
     return {
-      effectiveType: connection.effectiveType, // ex: '4g', '3g'
-      downlink: connection.downlink, // Vitesse de téléchargement estimée (Mb/s)
-      rtt: connection.rtt, // Round-Trip Time estimé (ms)
+      effectiveType: connection.effectiveType,
+      downlink: connection.downlink,
+      rtt: connection.rtt,
     };
   }
 
@@ -197,7 +192,6 @@ function App() {
     z: null,
   });
 
-  // function setupMotionListener() {
   useEffect(() => {
     if (!window.DeviceMotionEvent) {
       setMotionData({
@@ -220,7 +214,6 @@ function App() {
       window.removeEventListener("devicemotion", handleMotion);
     };
   }, []);
-  // }
 
   console.log(motionData);
 
@@ -241,11 +234,12 @@ function App() {
 
   return (
     <div className="flex flex-col bg-gray-900 min-h-screen items-center">
-      <div className="flex items-center justify-center mt-10">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row items-center justify-center mt-10 space-y-4 md:space-y-0">
         <img
           src="tracker.svg"
           width="40"
-          className="bg-orange-400 rounded-2xl mr-8"
+          className="bg-orange-400 rounded-2xl mr-4 md:mr-8"
         />
         <h1 className="text-green-500 text-4xl font-bold text-center">
           Info Tracker
@@ -253,15 +247,19 @@ function App() {
         <img
           src="tracker.svg"
           width="40"
-          className="ml-8 bg-orange-400 rounded-2xl"
+          className="ml-4 md:ml-8 bg-orange-400 rounded-2xl"
         />
       </div>
-      <p className="text-center mt-6 max-w-2xl text-white">
+
+      {/* Description */}
+      <p className="text-center mt-6 max-w-2xl text-white text-sm sm:text-base px-4">
         Explore the wealth of information your browser can provide and the
         actions a web application can perform without your knowledge. These
         include technical details, your settings, and your device's
         capabilities.
       </p>
+
+      {/* Content */}
       <div className="flex flex-col w-full max-w-5xl mt-10 space-y-4 px-4">
         {/* InfoBox System Info */}
         <div className="bg-gray-800 p-6 rounded-md text-white">
@@ -276,25 +274,23 @@ function App() {
           >
             Ask for position
           </button>
-
           {onClick && location && (
             <div className="flex flex-col p-6 rounded-md border border-green-500 w-full">
-              <div className="flex">
-                <pre>latitude: {location.latitude}</pre> &nbsp; &nbsp;
-                <pre>longitude: {location.longitude}</pre>
+              <div className="flex flex-col md:flex-row">
+                <pre>latitude: {location.latitude}</pre>
+                <pre className="md:ml-4">longitude: {location.longitude}</pre>
               </div>
-
-              <div className="flex flex-col items-start mt-4">
+              <div className="flex flex-col items-start mt-4 sm:text-base">
                 <pre>
                   {location.address.house_number}&nbsp;
-                  {location.address.road}&nbsp;
+                  {location.address.road}
+                  <br />
                   {location.address.postcode}&nbsp;
                   {location.address.town}
                 </pre>
               </div>
             </div>
           )}
-
           {onClick && error && (
             <div className="text-red-500 mt-4">
               <p>Error: {error}</p>
@@ -302,26 +298,22 @@ function App() {
           )}
         </div>
 
-        {/*  WebGL  */}
-        <div className="flex flex-row justify-between space-x-4">
-          <div className="bg-gray-800 p-6 rounded-md text-white flex-1">
+        {/* Responsive Grid Sections */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* WebGL */}
+          <div className="bg-gray-800 p-6 rounded-md text-white">
             <InfoBox title="WebGL" data={webGl} />
           </div>
-
           {/* Screen Resolution */}
-          <div className="bg-gray-800 p-6 rounded-md text-white flex-1">
+          <div className="bg-gray-800 p-6 rounded-md text-white">
             <InfoBox title="Screen Resolution" data={screenInfo} />
           </div>
-        </div>
-
-        {/* Time Format */}
-        <div className="flex flex-row justify-between space-x-4">
-          <div className="bg-gray-800 p-6 rounded-md text-white flex-1">
+          {/* Time Format */}
+          <div className="bg-gray-800 p-6 rounded-md text-white">
             <InfoBox title="Time Format" data={{ timeFormat }} />
           </div>
-
           {/* Local Storage */}
-          <div className="bg-gray-800 p-6 rounded-md text-white flex-1">
+          <div className="bg-gray-800 p-6 rounded-md text-white">
             <div className="p-6 rounded-md border border-green-500">
               <h1 className="text-xl mb-4 font-bold text-green-400">
                 Local Storage
@@ -330,7 +322,7 @@ function App() {
                 Value :
                 <span className="font-mono">
                   {storedValue
-                    ? (storedValue.match(/.{0,35}/g) || []).join("\n")
+                    ? (storedValue.match(/.{0,25}/g) || []).join("\n")
                     : "No value stored"}
                 </span>
               </p>
@@ -351,51 +343,43 @@ function App() {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Network */}
-        <div className="flex flex-row justify-between space-x-4">
-          <div className="bg-gray-800 p-6 rounded-md text-white flex-1">
+          {/* Network Info */}
+          <div className="bg-gray-800 p-6 rounded-md text-white">
             <InfoBox title="Network Info" data={getNetworkInfo()} />
           </div>
-          {/* Battery */}
-          <div className="bg-gray-800 p-6 rounded-md text-white flex-1">
+          {/* Battery Info */}
+          <div className="bg-gray-800 p-6 rounded-md text-white">
             <InfoBox title="Battery Info" data={batteryInfo} />
           </div>
-        </div>
-
-        {/* Motion */}
-        <div className="flex flex-row justify-between space-x-4">
-          <div className="bg-gray-800 p-6 rounded-md text-white flex-1">
+          {/* Motion Info */}
+          <div className="bg-gray-800 p-6 rounded-md text-white">
             <InfoBox title="Motion" data={motionData} />
           </div>
-
-          <div className="bg-gray-800 p-6 rounded-md text-white flex-1">
+          {/* Performance Info */}
+          <div className="bg-gray-800 p-6 rounded-md text-white">
             <InfoBox title="Performance" data={getPerformanceMetrics()} />
           </div>
         </div>
 
-        {/* Fonts */}
-        <div>
-          <div className="bg-gray-800 p-6 rounded-md text-white flex-1">
-            <div className="p-6 rounded-md border border-green-500">
-              <h1 className="text-xl mb-4 font-bold text-green-400">
-                Tested Fonts
-              </h1>
-              <div className="grid grid-cols-3 gap-4">
-                {Object.entries(detectInstalledFonts()).map(([key, value]) => (
-                  <div key={key} className={`flex  border-gray-700 `}>
-                    <div>{key} :&nbsp; </div>
-                    <div
-                      className={
-                        value ? "text-orange-400 font-bold" : "text-white"
-                      }
-                    >
-                      {value ? "true" : value.toString()}
-                    </div>
+        {/* Fonts Section */}
+        <div className="bg-gray-800 p-6 rounded-md text-white">
+          <div className="p-6 rounded-md border border-green-500">
+            <h1 className="text-xl mb-4 font-bold text-green-400">
+              Tested Fonts
+            </h1>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {Object.entries(detectInstalledFonts()).map(([key, value]) => (
+                <div key={key} className="flex border-gray-700">
+                  <div>{key} :&nbsp;</div>
+                  <div
+                    className={
+                      value ? "text-orange-400 font-bold" : "text-white"
+                    }
+                  >
+                    {value ? "true" : value.toString()}
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
